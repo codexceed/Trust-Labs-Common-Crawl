@@ -8,8 +8,7 @@ if __name__ == "__main__":
         warc_files = f.readlines()
 
     # Regex for precisely spotting variations of "covid-19" and "economy" in the html contents
-    # regex = re.compile(r"(?i)(?=.*(\.|\s|^)covid(\-*19)*(\.|\s|$))(?=.*(\.|\s|^)econom(y|ic(al)*|ies)((\.|\s|$))).*")
-    regex = re.compile(r"(?i)(?=.*(\.|\s|^)covid(\-*19)*(\.|\s|$)).*")
+    regex = re.compile(r"(?i)(?=.*(\.|\s|^)covid(\-*19)*(\.|\s|$))(?=.*(\.|\s|^)econom(y|ic(al)*|ies)((\.|\s|$))).*")
 
     valid_urls = []
     for file_url in warc_files:
