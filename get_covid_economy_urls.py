@@ -31,5 +31,5 @@ if __name__ == "__main__":
                     print(record.rec_headers.get_header("WARC-Target-URI"))
                     valid_urls.append(record.rec_headers.get_header("WARC-Target-URI"))
 
-        with open("covid_economy_urls_2020.txt", "w") as f:
-            f.writelines([url + "\n" for url in valid_urls])
+    with open("covid_economy_urls_2020.txt", "w") as f:
+        f.writelines([url + "\n" for url in valid_urls])
