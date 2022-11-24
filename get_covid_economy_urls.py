@@ -1,6 +1,7 @@
 from warcio.archiveiterator import ArchiveIterator
 import re
 import requests
+from datetime import datetime
 
 if __name__ == "__main__":
     common_crawl_base = "https://data.commoncrawl.org/"
@@ -8,9 +9,12 @@ if __name__ == "__main__":
         warc_files = f.readlines()
 
     # Regex for precisely spotting variations of "covid-19" and "economy" in the html contents
-    regex = re.compile(r"(?i)(?=.*(\.|\s|^)covid(\-*19)?)(?=.*(\.|\s|^)econom(y|ic(al)*|ies)).*")
+    regex1 = re.compile(r"(?i)(?=.*(\.|\s|^)covid(\-*19)?).*")
+    regex2 = re.compile(r"(?i)(?=.*(\.|\s|^)econom(y|ic(al)*|ies)).*")
 
     valid_urls = []
+    num_records = 0
+    start = datetime.now()
     for file_url in warc_files:
         entries = 0
         matching_entries = 0
@@ -27,9 +31,15 @@ if __name__ == "__main__":
         for record in ArchiveIterator(stream):
             if record.rec_type == "response":
                 contents = record.content_stream().read().decode("utf-8", "replace")
-                if regex.match(contents):
+                if regex1.search(contents) and regex2.search(contents):
                     print(record.rec_headers.get_header("WARC-Target-URI"))
                     valid_urls.append(record.rec_headers.get_header("WARC-Target-URI"))
 
-        with open("covid_economy_urls_2020.txt", "w") as f:
-            f.writelines([url + "\n" for url in valid_urls])
+            if num_records % 100 == 0:
+                print(f"Analyzed {num_records} records.")
+                print(f"Time since last checkpoint: {datetime.now() - start}")
+                start = datetime.now()
+            num_records += 1
+
+    with open("covid_economy_urls_2020.txt", "w") as f:
+        f.writelines([url + "\n" for url in valid_urls])
