@@ -1,6 +1,7 @@
 from warcio.archiveiterator import ArchiveIterator
 import re
 import requests
+import bs4
 
 if __name__ == "__main__":
     common_crawl_base = "https://data.commoncrawl.org/"
@@ -27,7 +28,9 @@ if __name__ == "__main__":
         for record in ArchiveIterator(stream):
             if record.rec_type == "response":
                 contents = record.content_stream().read().decode("utf-8", "replace")
-                if regex.match(contents):
+                soup = bs4.BeautifulSoup(contents, "html.parser")
+                results = soup.find(string=regex, recursive=True)
+                if results is not None:
                     print(record.rec_headers.get_header("WARC-Target-URI"))
                     valid_urls.append(record.rec_headers.get_header("WARC-Target-URI"))
 
